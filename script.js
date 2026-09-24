@@ -1,7 +1,7 @@
 "use strict";
 
 /* ---------- Config ---------- */
-const API_BASE_URL = "https://mental-health-score-predictor-t39l.onrender.com/";
+const API_BASE_URL = "https://mental-health-score-predictor-t39l.onrender.com";
 const REQUEST_TIMEOUT_MS = 15000;
 const SCORE_MAX = 10; // Upper end of the score scale used for the gauge
 const GAUGE_LENGTH = 2 * Math.PI * 54; // matches r="54" in index.html
