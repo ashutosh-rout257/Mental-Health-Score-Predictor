@@ -1,7 +1,7 @@
 "use strict";
 
 /* ---------- Config ---------- */
-const API_BASE_URL = "http://127.0.0.1:8000";
+const API_BASE_URL = "https://mental-health-score-predictor-t39l.onrender.com/";
 const REQUEST_TIMEOUT_MS = 15000;
 const SCORE_MAX = 10; // Upper end of the score scale used for the gauge
 const GAUGE_LENGTH = 2 * Math.PI * 54; // matches r="54" in index.html
@@ -67,16 +67,21 @@ function validateField(name) {
   const raw = getRawValue(name);
 
   if (raw === "") {
-    return rule.type === "choice" ? "Please choose an option." : "This field is required.";
+    return rule.type === "choice"
+      ? "Please choose an option."
+      : "This field is required.";
   }
   if (rule.type === "text") return "";
 
   if (rule.type === "int" || rule.type === "float") {
     const num = Number(raw);
     if (Number.isNaN(num)) return "Enter a valid number.";
-    if (rule.type === "int" && !Number.isInteger(num)) return "Enter a whole number.";
-    if (rule.min !== undefined && num < rule.min) return `Must be at least ${rule.min}.`;
-    if (rule.max !== undefined && num > rule.max) return `Must be ${rule.max} or less.`;
+    if (rule.type === "int" && !Number.isInteger(num))
+      return "Enter a whole number.";
+    if (rule.min !== undefined && num < rule.min)
+      return `Must be at least ${rule.min}.`;
+    if (rule.max !== undefined && num > rule.max)
+      return `Must be ${rule.max} or less.`;
   }
   return "";
 }
@@ -95,7 +100,8 @@ function buildPayload() {
   const payload = {};
   Object.entries(RULES).forEach(([name, rule]) => {
     const raw = getRawValue(name);
-    payload[name] = rule.type === "int" || rule.type === "float" ? Number(raw) : raw;
+    payload[name] =
+      rule.type === "int" || rule.type === "float" ? Number(raw) : raw;
   });
   return payload;
 }
@@ -108,12 +114,24 @@ function setState(state) {
 function bandFor(score) {
   const ratio = score / SCORE_MAX;
   if (ratio >= 0.7) {
-    return { label: "Strong wellbeing", color: "#b8f0cf", text: "This profile points to a healthy balance between screen time and daily life." };
+    return {
+      label: "Strong wellbeing",
+      color: "#b8f0cf",
+      text: "This profile points to a healthy balance between screen time and daily life.",
+    };
   }
   if (ratio >= 0.5) {
-    return { label: "Moderate wellbeing", color: "#ffe29a", text: "Some habits may be worth adjusting, such as sleep, activity or screen time." };
+    return {
+      label: "Moderate wellbeing",
+      color: "#ffe29a",
+      text: "Some habits may be worth adjusting, such as sleep, activity or screen time.",
+    };
   }
-  return { label: "Needs attention", color: "#ffc2b5", text: "This profile suggests risk. Consider talking with a counsellor or trusted adult." };
+  return {
+    label: "Needs attention",
+    color: "#ffc2b5",
+    text: "This profile suggests risk. Consider talking with a counsellor or trusted adult.",
+  };
 }
 
 function showResult(score) {
@@ -126,9 +144,11 @@ function showResult(score) {
   // Animate gauge and counter from zero
   gaugeFill.style.strokeDashoffset = GAUGE_LENGTH;
   const ratio = Math.min(Math.max(score / SCORE_MAX, 0), 1);
-  requestAnimationFrame(() => requestAnimationFrame(() => {
-    gaugeFill.style.strokeDashoffset = GAUGE_LENGTH * (1 - ratio);
-  }));
+  requestAnimationFrame(() =>
+    requestAnimationFrame(() => {
+      gaugeFill.style.strokeDashoffset = GAUGE_LENGTH * (1 - ratio);
+    }),
+  );
 
   const duration = 1200;
   const start = performance.now();
@@ -167,7 +187,9 @@ function handleValidationErrors(detail) {
   if (!Array.isArray(detail)) return { general: [String(detail)], firstField };
 
   detail.forEach((item) => {
-    const field = Array.isArray(item.loc) ? item.loc[item.loc.length - 1] : null;
+    const field = Array.isArray(item.loc)
+      ? item.loc[item.loc.length - 1]
+      : null;
     if (field && RULES[field]) {
       setFieldError(field, item.msg);
       if (!firstField) firstField = field;
@@ -191,7 +213,11 @@ async function requestPrediction(payload) {
     });
 
     let data = null;
-    try { data = await response.json(); } catch { /* non-JSON body */ }
+    try {
+      data = await response.json();
+    } catch {
+      /* non-JSON body */
+    }
 
     if (!response.ok) {
       const err = new Error("API error");
@@ -232,20 +258,36 @@ form.addEventListener("submit", async (event) => {
     showResult(score);
   } catch (err) {
     if (err.name === "AbortError") {
-      showError("Request timed out", "The server took too long to respond. Please try again.");
+      showError(
+        "Request timed out",
+        "The server took too long to respond. Please try again.",
+      );
     } else if (err.status === 422) {
       const { general, firstField } = handleValidationErrors(err.detail);
-      showError("Check your inputs", "The server rejected some values. Fix the highlighted fields and try again.", general);
+      showError(
+        "Check your inputs",
+        "The server rejected some values. Fix the highlighted fields and try again.",
+        general,
+      );
       if (firstField) {
         const el = form.elements[firstField];
         (el instanceof RadioNodeList ? el[0] : el).focus();
       }
     } else if (typeof err.status === "number" && err.status >= 500) {
-      showError("Server error", "The model could not process this input. Check the backend terminal for details, then try again.");
+      showError(
+        "Server error",
+        "The model could not process this input. Check the backend terminal for details, then try again.",
+      );
     } else if (err.status) {
-      showError("Unexpected response", `The API returned an unexpected result (${err.status}).`);
+      showError(
+        "Unexpected response",
+        `The API returned an unexpected result (${err.status}).`,
+      );
     } else {
-      showError("Can't reach the API", `Make sure the backend is running at ${API_BASE_URL} (uvicorn main:app --reload).`);
+      showError(
+        "Can't reach the API",
+        `Make sure the backend is running at ${API_BASE_URL} (uvicorn main:app --reload).`,
+      );
     }
   } finally {
     submitBtn.disabled = false;
