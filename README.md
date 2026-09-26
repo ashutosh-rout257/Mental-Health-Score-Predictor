@@ -6,6 +6,9 @@
 
 This project builds a machine learning model to predict students' mental health scores based on their social media habits and lifestyle factors. It uses a Kaggle dataset covering demographics, platform usage, and lifestyle attributes to train and evaluate regression models that estimate mental health score.
 
+
+ **Live Demo:** [https://mental-health-score-predictor-2-j78e.onrender.com/](https://mental-health-score-predictor-2-j78e.onrender.com/)
+
 ---
 
 ## 📌 Table of Contents
@@ -43,6 +46,8 @@ The goal is to predict a student's mental health score — a continuous value ra
 
 - **Language:** Python
 - **Libraries:** NumPy, Pandas, Matplotlib, Seaborn, Scikit-learn
+- **Backend:** FastAPI
+- **Frontend:** HTML, CSS, JavaScript
 
 ---
 
